@@ -38,14 +38,16 @@ $versionCode = if ($env:QRSCAN_VERSION_CODE) { $env:QRSCAN_VERSION_CODE } else {
 $versionName = if ($env:QRSCAN_VERSION_NAME) { ($env:QRSCAN_VERSION_NAME -replace '^v', '') } else { "1.0" }
 
 $out = Join-Path $root "out"
-$gen = Join-Path $out "gen"
-$obj = Join-Path $out "obj"
-$dexDir = Join-Path $out "dex"
-$resZip = Join-Path $out "res.zip"
-$rawApk = Join-Path $out "app-raw.apk"
-$alignedApk = Join-Path $out "app-aligned.apk"
+$tmpDir = Join-Path $out "tmp"
+$gen = Join-Path $tmpDir "gen"
+$obj = Join-Path $tmpDir "obj"
+$dexDir = Join-Path $tmpDir "dex"
+$resZip = Join-Path $tmpDir "res.zip"
+
+$rawApk = Join-Path $tmpDir "app-raw.apk"
+$alignedApk = Join-Path $tmpDir "app-aligned.apk"
 $finalApk = Join-Path $out "$appName-v$versionName.apk"
-$classesJar = Join-Path $out "classes.jar"
+$classesJar = Join-Path $tmpDir "classes.jar"
 $coreJar = Join-Path $root "libs\core-3.3.3.jar"
 $ks = Join-Path $root "qrscan.keystore"
 # 本地自签名证书口令：默认 android，可用环境变量 QRSCAN_STORE_PASS 覆盖
@@ -87,7 +89,7 @@ Write-Host "platform: $(Split-Path $platform -Leaf)"
 Write-Host "jdk    : $jdk"
 Write-Host ""
 
-foreach ($d in @($out, $gen, $obj, $dexDir)) {
+foreach ($d in @($out, $tmpDir, $gen, $obj, $dexDir)) {
     if (-not (Test-Path $d)) { New-Item -ItemType Directory -Force -Path $d | Out-Null }
 }
 

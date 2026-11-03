@@ -1,0 +1,14 @@
+# 构建产物
+out/
+dist/
+*.apk
+*.idsig
+
+# 签名私钥：不要提交到版本库，首次构建会自动生成
+*.keystore
+*.jks
+
+# 本机路径与临时文件
+local.properties
+*.log
+Thumbs.db

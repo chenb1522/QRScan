@@ -1,0 +1,48 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.qrscan.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.qrscan.app"
+        minSdk 23
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    sourceSets {
+        main {
+            // AGP 8 不允许 manifest 里写 package 属性，
+            // 所以 Studio 使用 app/src/gradle/AndroidManifest.xml（去掉 package 的副本）；
+            // 无 Gradle 手工构建（build.ps1）仍使用 app/src/main/AndroidManifest.xml。
+            manifest.srcFile 'src/gradle/AndroidManifest.xml'
+            java.srcDirs = ['src/main/java']
+            res.srcDirs = ['src/main/res']
+        }
+    }
+
+    lint {
+        abortOnError false
+    }
+}
+
+dependencies {
+    // ZXing core 是纯 Java 库，不引入任何 AAR / Google Play 服务依赖
+    implementation files('libs/core-3.3.3.jar')
+}

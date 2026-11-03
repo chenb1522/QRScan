@@ -70,6 +70,31 @@ jobs:
           path: out/*.apk
           if-no-files-found: error
 
+      - name: Clean stale release assets
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          $headers = @{ Authorization = "Bearer $env:GH_TOKEN"; "User-Agent" = "qrscan-ci" }
+          try {
+            $rel = Invoke-RestMethod -Headers $headers -Uri "https://api.github.com/repos/$env:REPO/releases/tags/$env:TAG"
+          } catch {
+            "release not found yet, skip cleanup"
+            exit 0
+          }
+          $keep = @(Get-ChildItem out -Filter *.apk | ForEach-Object { $_.Name })
+          "keep: $($keep -join ', ')"
+          foreach ($a in $rel.assets) {
+            if ($keep -notcontains $a.name) {
+              Invoke-RestMethod -Method Delete -Headers $headers `
+                -Uri "https://api.github.com/repos/$env:REPO/releases/assets/$($a.id)"
+              "deleted stale asset: $($a.name)"
+            }
+          }
+
       - name: Attach to release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2

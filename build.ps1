@@ -33,8 +33,9 @@ $appName = "QRScan"
 $pkg = "com.qrscan.app"
 $minSdk = "23"
 $targetSdk = "34"
-$versionCode = "1"
-$versionName = "1.0"
+# 版本号可用环境变量覆盖（CI 里用 run_number / tag 名）
+$versionCode = if ($env:QRSCAN_VERSION_CODE) { $env:QRSCAN_VERSION_CODE } else { "1" }
+$versionName = if ($env:QRSCAN_VERSION_NAME) { ($env:QRSCAN_VERSION_NAME -replace '^v', '') } else { "1.0" }
 
 $out = Join-Path $root "out"
 $gen = Join-Path $out "gen"
